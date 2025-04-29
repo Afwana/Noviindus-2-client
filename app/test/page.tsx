@@ -23,17 +23,17 @@ interface Questions {
   negativeMark: number;
 }
 
-// interface IQuestionApiResponse {
-//   success: boolean;
-//   questions_count: number;
-//   total_marks: number;
-//   total_time: number;
-//   time_for_each_question: number;
-//   mark_per_each_answer: number;
-//   negative_mark: number;
-//   instruction: string;
-//   questions: Questions[];
-// }
+interface IQuestionApiResponse {
+  success: boolean;
+  questions_count: number;
+  total_marks: number;
+  total_time: number;
+  time_for_each_question: number;
+  mark_per_each_answer: number;
+  negative_mark: number;
+  instruction: string;
+  questions: Questions[];
+}
 
 export default function Page() {
   const [questions, setQuestions] = useState<Questions[]>([]);
@@ -54,7 +54,7 @@ export default function Page() {
     const fetchQuestions = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("authToken");
         console.log(token);
 
         const response = await api.get("/question/list", {
@@ -62,7 +62,9 @@ export default function Page() {
             Authorization: `Bearer ${token}`,
           },
         });
-        setQuestions(response.data);
+        console.log(response);
+        const responseData = response.data as IQuestionApiResponse;
+        setQuestions(responseData?.questions);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching questions:", err);
@@ -205,7 +207,7 @@ export default function Page() {
     );
   }
 
-  if (questions.length === 0) {
+  if (questions?.length === 0) {
     return (
       <div className="flex justify-center items-center h-screen">
         <p className="text-sm">No questions available</p>
@@ -218,13 +220,13 @@ export default function Page() {
     <div className="flex flex-col gap-2 w-full">
       <Header />
       <div className="flex flex-col md:flex-row w-full justify-between items-start bg-[#F4FCFF] pt-3">
-        <div className="flex flex-col gap-3 md:border-r border-[#E9EBEC] px-5">
+        <div className="flex-grow flex-col gap-3 md:border-r border-[#E9EBEC] px-5">
           <div className="flex justify-between items-center p-2">
             <p className="text-lg font-medium text-[#1C3141]">
               Ancient Indian History MCQ
             </p>
             <p className="bg-white rounded-sm text-[16px] font-medium p-2 shadow-lg">
-              {`${currentQuestion.id}/100`}
+              {`${currentQuestion?.id}/100`}
             </p>
           </div>
           <div className="flex flex-col gap-3">
@@ -246,10 +248,10 @@ export default function Page() {
               <p className="text-lg font-medium text-[#1C3141]">
                 {`${currentQuestion?.id}. ${currentQuestion?.ques}`}
               </p>
-              {currentQuestion.attachments && (
+              {currentQuestion?.attachments && (
                 <div className="relative h-[161px] w-[288px]">
                   <Image
-                    src={currentQuestion.attachments}
+                    src={currentQuestion?.attachments}
                     alt="attachment"
                     fill
                     objectFit="cover"
@@ -261,7 +263,7 @@ export default function Page() {
             <p className="text-[#5C5C5C] text-sm font-medium">
               Choose the answer:
             </p>
-            {currentQuestion.options.map((opt) => (
+            {currentQuestion?.options.map((opt) => (
               <label
                 key={opt.key}
                 className="flex items-center justify-between border border-[#CECECE] rounded-[8px] w-full h-14 px-5 cursor-pointer">

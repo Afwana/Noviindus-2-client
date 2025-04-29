@@ -69,6 +69,7 @@ export default function Details({ phoneNumber }: { phoneNumber: string }) {
       });
 
       if (response.data.success) {
+        localStorage.setItem("authToken", response.data.access_token);
         router.push("/instructions");
       } else {
         alert(response.data.message || "Profile creation failed");
